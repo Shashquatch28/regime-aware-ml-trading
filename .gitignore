@@ -20,7 +20,10 @@ dist/
 # ----------------------
 # Jupyter
 # ----------------------
-.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+*.ipynb_checkpoints
+*.ipynb~  # Jupyter autosave files
+
 
 # ----------------------
 # Data (large files)

@@ -4,7 +4,7 @@ from pathlib import Path
 RAW_DIR = Path("data/raw")
 PROCESSED_DIR = Path("data/processed")
 
-FILES = [
+ASSETS = [
     "SP500",
     "NASDAQ",
     "NIFTY50",
@@ -17,34 +17,37 @@ FILES = [
 ]
 
 
-def load_data():
+def load_asset(asset):
+    df = pd.read_parquet(RAW_DIR / f"{asset}.parquet")
+    df = df[["Close", "Volume"]]
+    df.columns = [f"{asset}_close", f"{asset}_volume"]
+    return df
+
+
+def build_dataset():
 
     dfs = []
 
-    for file in FILES:
-        df = pd.read_parquet(RAW_DIR / f"{file}.parquet")
-
-        df = df[["Close", "Volume"]]
-        df.columns = [f"{file}_close", f"{file}_volume"]
-
+    for asset in ASSETS:
+        df = load_asset(asset)
         dfs.append(df)
 
     data = pd.concat(dfs, axis=1)
 
+    data = data.sort_index()
+
+    data = data.ffill()
+
+    data = data.dropna()
+
     return data
 
 
-def preprocess():
-
-    df = load_data()
-
-    df = df.sort_index()
-
-    df = df.ffill()
-
-    df = df.dropna()
+def main():
 
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+
+    df = build_dataset()
 
     df.to_parquet(PROCESSED_DIR / "market_data.parquet")
 
@@ -52,4 +55,4 @@ def preprocess():
 
 
 if __name__ == "__main__":
-    preprocess()
+    main()
