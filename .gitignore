@@ -1,0 +1,83 @@
+# ----------------------
+# Python
+# ----------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+trading_env/
+.venv/
+
+# Python build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ----------------------
+# Jupyter
+# ----------------------
+.ipynb_checkpoints/
+
+# ----------------------
+# Data (large files)
+# ----------------------
+data/raw/
+data/processed/
+
+# If you later want to version small datasets remove above
+# and instead ignore only large formats:
+# *.parquet
+# *.csv
+# *.feather
+
+# ----------------------
+# Logs
+# ----------------------
+*.log
+
+# ----------------------
+# Environment variables
+# ----------------------
+.env
+
+# ----------------------
+# IDE files
+# ----------------------
+.vscode/
+.idea/
+
+# Cursor editor
+.cursor/
+
+# ----------------------
+# OS files
+# ----------------------
+.DS_Store
+Thumbs.db
+
+# ----------------------
+# Temporary files
+# ----------------------
+*.tmp
+*.temp
+
+# ----------------------
+# Python test cache
+# ----------------------
+.pytest_cache/
+
+# ----------------------
+# Coverage reports
+# ----------------------
+.coverage
+htmlcov/
+
+# ----------------------
+# Misc
+# ----------------------
+*.sqlite
+*.db
