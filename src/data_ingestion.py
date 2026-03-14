@@ -1,8 +1,10 @@
 import yfinance as yf
 import pandas as pd
 from pathlib import Path
+import time
 
 DATA_DIR = Path("data/raw")
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 ASSETS = {
     "SP500": "^GSPC",
@@ -16,27 +18,39 @@ ASSETS = {
     "BTC": "BTC-USD"
 }
 
-START_DATE = "2005-01-01"
+START_DATE = "2000-01-01"
 END_DATE = "2024-12-31"
 
 
 def download_asset(symbol, name):
-    df = yf.download(symbol, start=START_DATE, end=END_DATE, auto_adjust=False)
+
+    print(f"Downloading {name}")
+
+    df = yf.download(
+        symbol,
+        start=START_DATE,
+        end=END_DATE,
+        auto_adjust=False,
+        progress=False,
+        threads=False
+    )
 
     if df.empty:
-        print(f"Failed download: {symbol}")
+        print(f"{name} returned empty data")
         return
 
     df.to_parquet(DATA_DIR / f"{name}.parquet")
 
 
-def download_all():
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
+def main():
 
     for name, symbol in ASSETS.items():
-        print(f"Downloading {name}")
+
         download_asset(symbol, name)
+
+        # prevent Yahoo throttling
+        time.sleep(1)
 
 
 if __name__ == "__main__":
-    download_all()
+    main()
