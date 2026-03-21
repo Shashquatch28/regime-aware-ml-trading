@@ -127,7 +127,17 @@ def reorder_hmm_parameters(model, mapping):
     order = [mapping[i] for i in sorted(mapping.keys())]
 
     model.means_ = model.means_[order]
-    model.covars_ = model.covars_[order]
+
+    covars = model.covars_[order]
+
+    # Enforce symmetry and numerical positive definiteness after reordering
+    for i in range(len(covars)):
+        cov = covars[i]
+        cov = (cov + cov.T) / 2
+        cov += np.eye(cov.shape[0]) * 1e-6
+        covars[i] = cov
+
+    model.covars_ = covars
     model.startprob_ = model.startprob_[order]
 
     # Reorder both rows and columns of the transition matrix to maintain consistency
