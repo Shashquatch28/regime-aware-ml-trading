@@ -1,13 +1,13 @@
 import pandas as pd
 
-from ml_models import (
-    train_regime_models,
-    predict_proba_with_regimes,
-    convert_probs_to_signal
+from ml_models_baseline import (
+    train_models_per_regime,
+    predict_with_regimes,
+    generate_signal
 )
 
-INPUT_PATH = "data/processed/final_model_dataset.parquet"
-OUTPUT_PATH = "data/processed/ml_predictions.parquet"
+INPUT_PATH = "data/processed/baseline_dataset.parquet"
+OUTPUT_PATH = "data/processed/baseline_predictions.parquet"
 
 
 def main():
@@ -15,9 +15,6 @@ def main():
     print("Loading dataset...")
     df = pd.read_parquet(INPUT_PATH)
 
-    # -----------------------------
-    # FEATURES
-    # -----------------------------
     FEATURES = [
         'spx_vol_20', 'spx_vol_60', 'vol_ratio', 'vol_gradient',
         'spx_mom_20', 'spx_mom_60', 'gold_mom_20',
@@ -32,29 +29,26 @@ def main():
 
         # regime probabilities
         'regime_prob_0', 'regime_prob_1',
-        'regime_prob_2', 'regime_prob_3',
-
-        # NEW FEATURES
-        'delta_regime_prob_0', 'delta_regime_prob_1',
-        'delta_regime_prob_2', 'delta_regime_prob_3',
-        'regime_persistence'
+        'regime_prob_2', 'regime_prob_3'
     ]
 
-    print("Training regime models...")
-    models = train_regime_models(df, FEATURES)
+    print("Training models...")
+    dir_models, meta_models = train_models_per_regime(df, FEATURES)
 
-    print("Generating predictions...")
-    probs = predict_proba_with_regimes(df, models, FEATURES)
+    print("Predicting...")
+    direction_pred, meta_pred = predict_with_regimes(
+        df, dir_models, meta_models, FEATURES
+    )
 
-    print("Converting to signals...")
-    signals = convert_probs_to_signal(probs)
+    print("Generating signals...")
+    signals = generate_signal(direction_pred, meta_pred)
 
     df["signal"] = signals
 
     print("\nSignal distribution:")
     print(df["signal"].value_counts(normalize=True))
 
-    print("Saving results...")
+    print("Saving...")
     df.to_parquet(OUTPUT_PATH)
 
     print(f"Saved to {OUTPUT_PATH}")
